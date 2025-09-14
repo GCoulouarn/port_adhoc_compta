@@ -1,0 +1,229 @@
+{% extends 'comptabilite/base.html' %}
+
+{% block title %}Écritures Comptables - Port Adhoc Compta{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Écritures Comptables</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-download me-1"></i>
+                Exporter
+            </button>
+            <button type="button" class="btn btn-sm btn-primary">
+                <i class="fas fa-plus me-1"></i>
+                Nouvelle écriture
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Filtres avancés -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-filter me-2"></i>
+            Filtres de recherche
+        </h6>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label for="societe" class="form-label">Société</label>
+                <select class="form-select" id="societe" name="societe">
+                    <option value="">Toutes les sociétés</option>
+                    <!-- Les options seront chargées via JavaScript -->
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="compte" class="form-label">Compte</label>
+                <input type="text" class="form-control" id="compte" name="compte" 
+                       placeholder="Numéro de compte..." value="{{ request.GET.compte }}">
+            </div>
+            <div class="col-md-2">
+                <label for="date_debut" class="form-label">Date début</label>
+                <input type="date" class="form-control" id="date_debut" name="date_debut" 
+                       value="{{ request.GET.date_debut }}">
+            </div>
+            <div class="col-md-2">
+                <label for="date_fin" class="form-label">Date fin</label>
+                <input type="date" class="form-control" id="date_fin" name="date_fin" 
+                       value="{{ request.GET.date_fin }}">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">
+                    <i class="fas fa-search me-1"></i>
+                    Filtrer
+                </button>
+                <a href="{% url 'comptabilite:finance_faits_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times me-1"></i>
+                    Effacer
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tableau des écritures -->
+<div class="card shadow">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">
+            Liste des écritures ({{ ecritures|length }} résultat{{ ecritures|length|pluralize }})
+        </h6>
+    </div>
+    <div class="card-body">
+        {% if ecritures %}
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Société</th>
+                            <th>Compte</th>
+                            <th>Intitulé</th>
+                            <th>Journal</th>
+                            <th class="text-end">Débit</th>
+                            <th class="text-end">Crédit</th>
+                            <th class="text-end">Solde</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ecriture in ecritures %}
+                        <tr>
+                            <td>
+                                <span class="badge bg-light text-dark">
+                                    {{ ecriture.date_ecriture|date:"d/m/Y" }}
+                                </span>
+                            </td>
+                            <td>
+                                <small class="text-muted">{{ ecriture.societe.code }}</small>
+                            </td>
+                            <td>
+                                <strong>{{ ecriture.compte.compte }}</strong>
+                                <br>
+                                <small class="text-muted">{{ ecriture.compte.intitule|truncatechars:30 }}</small>
+                            </td>
+                            <td>
+                                <span title="{{ ecriture.intitule_ecriture }}">
+                                    {{ ecriture.intitule_ecriture|truncatechars:40 }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if ecriture.journal_numero %}
+                                    <span class="badge bg-info">{{ ecriture.journal_numero }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                {% if ecriture.debit %}
+                                    <span class="text-danger fw-bold">
+                                        {{ ecriture.debit|floatformat:2 }} €
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                {% if ecriture.credit %}
+                                    <span class="text-success fw-bold">
+                                        {{ ecriture.credit|floatformat:2 }} €
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                {% if ecriture.solde %}
+                                    <span class="fw-bold {% if ecriture.solde > 0 %}text-danger{% else %}text-success{% endif %}">
+                                        {{ ecriture.solde|floatformat:2 }} €
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button type="button" class="btn btn-outline-primary" title="Voir">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" title="Modifier">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger" title="Supprimer">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            {% if is_paginated %}
+                <nav aria-label="Pagination des écritures">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1">&laquo; Première</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Précédente</a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">
+                                Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivante</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Dernière &raquo;</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">Aucune écriture trouvée</h5>
+                <p class="text-muted">Aucune écriture ne correspond à vos critères de recherche.</p>
+                <a href="{% url 'comptabilite:finance_faits_list' %}" class="btn btn-primary">
+                    <i class="fas fa-refresh me-1"></i>
+                    Voir toutes les écritures
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Charger les sociétés pour le filtre
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/api/societes/')
+        .then(response => response.json())
+        .then(data => {
+            const select = document.getElementById('societe');
+            data.results.forEach(societe => {
+                const option = document.createElement('option');
+                option.value = societe.id;
+                option.textContent = `${societe.code} - ${societe.intitule}`;
+                select.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Erreur lors du chargement des sociétés:', error));
+});
+</script>
+{% endblock %}

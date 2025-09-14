@@ -1,0 +1,100 @@
+{% extends 'comptabilite/base.html' %}
+
+{% block title %}Supprimer Société - Port Adhoc Compta{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Confirmer la suppression
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning" role="alert">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-warning me-2"></i>
+                            Attention !
+                        </h6>
+                        <p class="mb-0">
+                            Vous êtes sur le point de supprimer définitivement cette société. 
+                            Cette action est irréversible.
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">Société à supprimer</h6>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th class="text-muted" style="width: 30%;">ID :</th>
+                                    <td><span class="badge bg-secondary">{{ object.id }}</span></td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Code :</th>
+                                    <td><strong>{{ object.code }}</strong></td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Intitulé :</th>
+                                    <td>{{ object.intitule }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Type :</th>
+                                    <td>
+                                        {% if object.groupe %}
+                                            <span class="badge bg-info">
+                                                <i class="fas fa-layer-group me-1"></i>
+                                                Groupe
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-primary">
+                                                <i class="fas fa-building me-1"></i>
+                                                Société
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Statut :</th>
+                                    <td>
+                                        {% if object.archive %}
+                                            <span class="badge bg-secondary">
+                                                <i class="fas fa-archive me-1"></i>
+                                                Archivé
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check me-1"></i>
+                                                Actif
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'comptabilite:societe_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>
+                                Annuler
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-1"></i>
+                                Confirmer la suppression
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

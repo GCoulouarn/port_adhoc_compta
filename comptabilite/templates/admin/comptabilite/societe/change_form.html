@@ -1,0 +1,18 @@
+{% extends "admin/change_form.html" %}
+
+{% block field_sets %}
+    {% if original %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>ID actuel :</strong> {{ original.id }}
+        </div>
+    {% else %}
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Nouvel enregistrement :</strong> L'ID sera automatiquement attribué lors de la sauvegarde.
+            <br>
+            <small>Pour voir les IDs existants, consultez la <a href="{% url 'admin:comptabilite_societe_changelist' %}">liste des sociétés</a>.</small>
+        </div>
+    {% endif %}
+    {{ block.super }}
+{% endblock %}

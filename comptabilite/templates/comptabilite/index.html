@@ -1,0 +1,238 @@
+{% extends 'comptabilite/base.html' %}
+
+{% block title %}Tableau de bord - Port Adhoc Compta{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Tableau de bord</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-download me-1"></i>
+                Exporter
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Statistiques principales -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Sociétés
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ societes_count }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-building fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Écritures Comptables
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ ecritures_count|floatformat:0 }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-file-invoice fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Comptes
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ comptes_count|floatformat:0 }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-list fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Base de données
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            SQL Server
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-database fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Actions rapides -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">Actions rapides</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'comptabilite:societe_list' %}" class="btn btn-primary btn-block w-100">
+                            <i class="fas fa-building me-2"></i>
+                            Gérer les sociétés
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="#" class="btn btn-success btn-block w-100">
+                            <i class="fas fa-file-invoice me-2"></i>
+                            Voir les écritures (Bientôt)
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="/admin/" class="btn btn-info btn-block w-100">
+                            <i class="fas fa-cog me-2"></i>
+                            Administration
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="/api/" class="btn btn-warning btn-block w-100">
+                            <i class="fas fa-code me-2"></i>
+                            API REST
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Information sur la gestion des IDs -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="alert alert-warning">
+            <h5 class="alert-heading">
+                <i class="fas fa-key me-2"></i>
+                Gestion des IDs
+            </h5>
+            <p class="mb-2">Les enregistrements utilisent des IDs numériques spécifiques à la base de données existante :</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <h6><i class="fas fa-exclamation-triangle text-warning me-2"></i>IDs à saisir manuellement :</h6>
+                    <ul class="mb-0">
+                        <li><strong>Sociétés</strong> (SOC_Id)</li>
+                        <li><strong>Stades</strong> (STA_Id)</li>
+                        <li><strong>Natures de compte</strong> (NCT_Id)</li>
+                        <li><strong>Types de valeur</strong> (TYV_Id)</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6><i class="fas fa-magic text-success me-2"></i>IDs auto-incrémentés :</h6>
+                    <ul class="mb-0">
+                        <li><strong>Groupes de compte</strong> (PLG_Id)</li>
+                        <li><strong>Comptes locaux</strong> (PCL_Id)</li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <p class="mb-0">
+                <small>Pour voir les IDs existants, consultez les listes dans l'<a href="/admin/" class="alert-link">interface d'administration</a>.</small>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Informations sur la migration -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Migration C# vers Django réussie
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Fonctionnalités migrées :</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i> Modèles de données (Entity Framework → Django ORM)</li>
+                            <li><i class="fas fa-check text-success me-2"></i> Interface utilisateur (WinForms → Web)</li>
+                            <li><i class="fas fa-check text-success me-2"></i> Gestion des sociétés</li>
+                            <li><i class="fas fa-check text-success me-2"></i> Plan comptable</li>
+                            <li><i class="fas fa-check text-success me-2"></i> Écritures comptables</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Nouvelles fonctionnalités :</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-plus text-info me-2"></i> Interface web responsive</li>
+                            <li><i class="fas fa-plus text-info me-2"></i> API REST complète</li>
+                            <li><i class="fas fa-plus text-info me-2"></i> Administration Django</li>
+                            <li><i class="fas fa-plus text-info me-2"></i> Filtres avancés</li>
+                            <li><i class="fas fa-plus text-info me-2"></i> Export/Import de données</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .border-left-primary {
+        border-left: 0.25rem solid #4e73df !important;
+    }
+    .border-left-success {
+        border-left: 0.25rem solid #1cc88a !important;
+    }
+    .border-left-info {
+        border-left: 0.25rem solid #36b9cc !important;
+    }
+    .border-left-warning {
+        border-left: 0.25rem solid #f6c23e !important;
+    }
+    .text-xs {
+        font-size: 0.7rem;
+    }
+    .text-gray-300 {
+        color: #dddfeb !important;
+    }
+    .text-gray-800 {
+        color: #5a5c69 !important;
+    }
+</style>
+{% endblock %}

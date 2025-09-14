@@ -1,0 +1,175 @@
+{% extends 'comptabilite/base.html' %}
+
+{% block title %}Mon Profil - Port Adhoc Compta{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-user me-2"></i>
+                    Mon Profil
+                </h1>
+                <div>
+                    <a href="{% url 'comptabilite:index' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Retour à l'accueil
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-user-circle me-2"></i>
+                                Informations du compte
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th class="text-muted" style="width: 30%;">Nom d'utilisateur :</th>
+                                    <td><strong>{{ user.username }}</strong></td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Email :</th>
+                                    <td>{{ user.email|default:"Non renseigné" }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Prénom :</th>
+                                    <td>{{ user.first_name|default:"Non renseigné" }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Nom :</th>
+                                    <td>{{ user.last_name|default:"Non renseigné" }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Date d'inscription :</th>
+                                    <td>{{ user.date_joined|date:"d/m/Y à H:i" }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Dernière connexion :</th>
+                                    <td>{{ user.last_login|date:"d/m/Y à H:i"|default:"Jamais" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                Permissions et statut
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <strong>Statut du compte :</strong>
+                                {% if user.is_active %}
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check me-1"></i>
+                                        Actif
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-times me-1"></i>
+                                        Inactif
+                                    </span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Rôles :</strong><br>
+                                {% if user.is_superuser %}
+                                    <span class="badge bg-danger me-1">
+                                        <i class="fas fa-crown me-1"></i>
+                                        Super utilisateur
+                                    </span>
+                                {% endif %}
+                                {% if user.is_staff %}
+                                    <span class="badge bg-warning me-1">
+                                        <i class="fas fa-cog me-1"></i>
+                                        Personnel
+                                    </span>
+                                {% endif %}
+                                {% if not user.is_staff and not user.is_superuser %}
+                                    <span class="badge bg-primary">
+                                        <i class="fas fa-user me-1"></i>
+                                        Utilisateur standard
+                                    </span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Accès :</strong><br>
+                                <ul class="list-unstyled mb-0">
+                                    <li>
+                                        <i class="fas fa-check text-success me-2"></i>
+                                        Consultation des données
+                                    </li>
+                                    {% if user.is_staff %}
+                                    <li>
+                                        <i class="fas fa-check text-success me-2"></i>
+                                        Interface d'administration
+                                    </li>
+                                    {% endif %}
+                                    {% if user.is_superuser %}
+                                    <li>
+                                        <i class="fas fa-check text-success me-2"></i>
+                                        Toutes les permissions
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions rapides -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bolt me-2"></i>
+                        Actions rapides
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <a href="{% url 'comptabilite:societe_list' %}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-building me-2"></i>
+                                Voir les sociétés
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'comptabilite:devise_list' %}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-coins me-2"></i>
+                                Voir les devises
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            {% if user.is_staff %}
+                            <a href="/admin/" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-cog me-2"></i>
+                                Administration
+                            </a>
+                            {% else %}
+                            <a href="{% url 'comptabilite:index' %}" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-home me-2"></i>
+                                Retour à l'accueil
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

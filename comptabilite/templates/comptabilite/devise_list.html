@@ -1,0 +1,261 @@
+{% extends 'comptabilite/base.html' %}
+{% load url_replace %}
+
+{% block title %}Devises - Port Adhoc Compta{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Devises</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-download me-1"></i>
+                Exporter
+            </button>
+            {% if can_add_devise %}
+            <a href="{% url 'comptabilite:devise_create' %}" class="btn btn-sm btn-primary">
+                <i class="fas fa-plus me-1"></i>
+                Nouvelle devise
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Filtres -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-6">
+                <label for="search" class="form-label">Recherche</label>
+                <input type="text" class="form-control" id="search" name="search" 
+                       placeholder="Code ISO, intitulé ou sigle..." value="{{ request.GET.search }}">
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">
+                    <i class="fas fa-search me-1"></i>
+                    Filtrer
+                </button>
+                <a href="{% url 'comptabilite:devise_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times me-1"></i>
+                    Effacer
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tableau des devises -->
+<div class="card shadow">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">
+            Liste des devises ({{ devises|length }} résultat{{ devises|length|pluralize }})
+        </h6>
+    </div>
+    <div class="card-body">
+        {% if devises %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="sortable">
+                                <a href="?{% url_replace request sort='id' order=next_order %}" 
+                                   class="text-decoration-none text-dark d-flex align-items-center justify-content-between">
+                                    <span>ID</span>
+                                    <span class="sort-icons">
+                                        {% if current_sort == 'id' %}
+                                            {% if current_order == 'asc' %}
+                                                <i class="fas fa-sort-up text-primary"></i>
+                                            {% else %}
+                                                <i class="fas fa-sort-down text-primary"></i>
+                                            {% endif %}
+                                        {% else %}
+                                            <i class="fas fa-sort text-muted"></i>
+                                        {% endif %}
+                                    </span>
+                                </a>
+                            </th>
+                            <th class="sortable">
+                                <a href="?{% url_replace request sort='code_iso' order=next_order %}" 
+                                   class="text-decoration-none text-dark d-flex align-items-center justify-content-between">
+                                    <span>Code ISO</span>
+                                    <span class="sort-icons">
+                                        {% if current_sort == 'code_iso' %}
+                                            {% if current_order == 'asc' %}
+                                                <i class="fas fa-sort-up text-primary"></i>
+                                            {% else %}
+                                                <i class="fas fa-sort-down text-primary"></i>
+                                            {% endif %}
+                                        {% else %}
+                                            <i class="fas fa-sort text-muted"></i>
+                                        {% endif %}
+                                    </span>
+                                </a>
+                            </th>
+                            <th class="sortable">
+                                <a href="?{% url_replace request sort='intitule' order=next_order %}" 
+                                   class="text-decoration-none text-dark d-flex align-items-center justify-content-between">
+                                    <span>Intitulé</span>
+                                    <span class="sort-icons">
+                                        {% if current_sort == 'intitule' %}
+                                            {% if current_order == 'asc' %}
+                                                <i class="fas fa-sort-up text-primary"></i>
+                                            {% else %}
+                                                <i class="fas fa-sort-down text-primary"></i>
+                                            {% endif %}
+                                        {% else %}
+                                            <i class="fas fa-sort text-muted"></i>
+                                        {% endif %}
+                                    </span>
+                                </a>
+                            </th>
+                            <th class="sortable">
+                                <a href="?{% url_replace request sort='sigle' order=next_order %}" 
+                                   class="text-decoration-none text-dark d-flex align-items-center justify-content-between">
+                                    <span>Sigle</span>
+                                    <span class="sort-icons">
+                                        {% if current_sort == 'sigle' %}
+                                            {% if current_order == 'asc' %}
+                                                <i class="fas fa-sort-up text-primary"></i>
+                                            {% else %}
+                                                <i class="fas fa-sort-down text-primary"></i>
+                                            {% endif %}
+                                        {% else %}
+                                            <i class="fas fa-sort text-muted"></i>
+                                        {% endif %}
+                                    </span>
+                                </a>
+                            </th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for devise in devises %}
+                        <tr>
+                            <td>
+                                <span class="badge bg-secondary">{{ devise.id }}</span>
+                            </td>
+                            <td>
+                                <strong>{{ devise.code_iso|default:"-" }}</strong>
+                            </td>
+                            <td>{{ devise.intitule|default:"-" }}</td>
+                            <td>
+                                {% if devise.sigle %}
+                                    <span class="badge bg-info">{{ devise.sigle }}</span>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{% url 'comptabilite:devise_detail' devise.pk %}" 
+                                       class="btn btn-outline-primary" title="Voir">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% if can_change_devise %}
+                                    <a href="{% url 'comptabilite:devise_edit' devise.pk %}" 
+                                       class="btn btn-outline-secondary" title="Modifier">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% endif %}
+                                    {% if can_delete_devise %}
+                                    <a href="{% url 'comptabilite:devise_delete' devise.pk %}" 
+                                       class="btn btn-outline-danger" title="Supprimer">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            {% if is_paginated %}
+                <nav aria-label="Pagination des devises">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1">&laquo; Première</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Précédente</a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">
+                                Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivante</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Dernière &raquo;</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-coins fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">Aucune devise trouvée</h5>
+                <p class="text-muted">Aucune devise ne correspond à vos critères de recherche.</p>
+                <a href="{% url 'comptabilite:devise_list' %}" class="btn btn-primary">
+                    <i class="fas fa-refresh me-1"></i>
+                    Voir toutes les devises
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Informations sur la gestion des IDs -->
+<div class="alert alert-info mt-4">
+    <h6 class="alert-heading">
+        <i class="fas fa-info-circle me-2"></i>
+        Information sur la gestion des IDs
+    </h6>
+    <p class="mb-2">
+        <strong>Type de clé primaire :</strong> 
+        <span class="badge bg-warning">Manuelle</span> 
+        (non auto-incrémentée)
+    </p>
+    <p class="mb-0">
+        <small>
+            <i class="fas fa-exclamation-triangle me-1"></i>
+            Les IDs des devises sont gérés manuellement. 
+            Pour créer une nouvelle devise, consultez la liste pour voir les IDs disponibles.
+        </small>
+    </p>
+</div>
+
+<style>
+.sortable a:hover {
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin: -4px -8px;
+}
+
+.sort-icons {
+    font-size: 0.8em;
+    margin-left: 8px;
+}
+
+.sortable th {
+    position: relative;
+    cursor: pointer;
+}
+
+.sortable th:hover {
+    background-color: #f8f9fa;
+}
+</style>
+{% endblock %}

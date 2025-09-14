@@ -1,0 +1,115 @@
+{% extends 'comptabilite/base.html' %}
+
+{% block title %}Détails de la Devise - {{ devise.intitule }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-coins me-2"></i>
+                    Détails de la Devise
+                </h1>
+                <div>
+                    <a href="{% url 'comptabilite:devise_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Retour à la liste
+                    </a>
+                    <a href="{% url 'admin:comptabilite_devise_change' devise.id %}" class="btn btn-primary">
+                        <i class="fas fa-edit me-1"></i>
+                        Modifier
+                    </a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-coins me-2"></i>
+                        {{ devise.intitule|default:"Devise sans intitulé" }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th class="text-muted" style="width: 30%;">ID :</th>
+                                    <td>
+                                        <span class="badge bg-secondary fs-6">{{ devise.id }}</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Code ISO :</th>
+                                    <td>
+                                        {% if devise.code_iso %}
+                                            <code class="bg-light px-2 py-1 rounded">{{ devise.code_iso }}</code>
+                                        {% else %}
+                                            <em class="text-muted">Non renseigné</em>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Intitulé :</th>
+                                    <td><strong>{{ devise.intitule|default:"Non renseigné" }}</strong></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th class="text-muted" style="width: 30%;">Sigle :</th>
+                                    <td>
+                                        {% if devise.sigle %}
+                                            <span class="badge bg-info fs-6">{{ devise.sigle }}</span>
+                                        {% else %}
+                                            <em class="text-muted">Non renseigné</em>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Représentation :</th>
+                                    <td>
+                                        {% if devise.sigle %}
+                                            <span class="fs-4">{{ devise.sigle }}</span>
+                                            {% if devise.code_iso %}
+                                                <small class="text-muted ms-2">({{ devise.code_iso }})</small>
+                                            {% endif %}
+                                        {% elif devise.code_iso %}
+                                            <span class="fs-4">{{ devise.code_iso }}</span>
+                                        {% else %}
+                                            <em class="text-muted">Aucune représentation</em>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informations sur la gestion des IDs -->
+            <div class="alert alert-info mt-4">
+                <h6 class="alert-heading">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Information sur la gestion des IDs
+                </h6>
+                <p class="mb-2">
+                    <strong>ID actuel :</strong> {{ devise.id }}<br>
+                    <strong>Type de clé primaire :</strong> 
+                    <span class="badge bg-warning">Manuelle</span> 
+                    (non auto-incrémentée)
+                </p>
+                <p class="mb-0">
+                    <small>
+                        <i class="fas fa-exclamation-triangle me-1"></i>
+                        Les IDs des devises sont gérés manuellement. 
+                        Pour créer une nouvelle devise, consultez la liste pour voir les IDs disponibles.
+                    </small>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
