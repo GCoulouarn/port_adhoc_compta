@@ -1,5 +1,9 @@
 {% extends "admin/base.html" %}
 
+{% block title %}
+  {{ admin_labels.site.title|default:_('Port Adhoc Compta') }}
+{% endblock %}
+
 {% block extrahead %}
   {{ block.super }}
   <style>
@@ -9,7 +13,7 @@
 {% endblock %}
 
 {% block branding %}
-  {{ block.super }}
+  <h1 id="site-name"><a href="{% url 'admin:index' %}">{{ admin_labels.site.header|default:_('Administration de Django') }}</a></h1>
 {% endblock %}
 
 

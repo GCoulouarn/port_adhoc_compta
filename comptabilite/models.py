@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from .dynamic_labels import DynamicLabelsMixin
 
 
 class Societe(models.Model):
@@ -9,7 +10,7 @@ class Societe(models.Model):
     intitule = models.CharField(max_length=255, db_column='SOC_Intitule', verbose_name="Intitulé")
     groupe = models.BooleanField(default=False, db_column='SOC_Groupe', verbose_name="Groupe")
     archive = models.BooleanField(null=True, blank=True, db_column='SOC_Archive', verbose_name="Archivé")
-    devise_id = models.IntegerField(null=True, blank=True, db_column='DEV_Id', verbose_name="ID Devise")
+    devise = models.ForeignKey('Devise', on_delete=models.SET_NULL, null=True, blank=True, db_column='DEV_Id', verbose_name="Devise")
 
     class Meta:
         db_table = 'T_E_Societe_SOC'
@@ -141,7 +142,7 @@ class PlanCompteLocal(models.Model):
         return f"{self.compte} - {self.intitule}"
 
 
-class Devise(models.Model):
+class Devise(DynamicLabelsMixin, models.Model):
     """Modèle pour les devises - équivalent à T_E_Devises_DEV"""
     id = models.IntegerField(primary_key=True, db_column='DEV_Id', verbose_name="ID")
     code_iso = models.CharField(max_length=3, db_column='DEV_CodeIso', verbose_name="Code ISO", null=True, blank=True)
@@ -164,6 +165,8 @@ class Devise(models.Model):
 
     def __str__(self):
         return f"{self.code_iso} - {self.intitule}"
+
+# Les libellés dynamiques seront appliqués par l'admin
 
 
 # Modèles simplifiés pour correspondre à la structure existante de la base

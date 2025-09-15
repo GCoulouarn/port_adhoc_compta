@@ -1,0 +1,125 @@
+{% load i18n %}
+
+{% if app_list %}
+  {% for app in app_list %}
+    <div class="app-{{ app.app_label }} module{% if app.app_url in request.path|urlencode %} current-app{% endif %}">
+      <table>
+        <caption>
+          <a href="{{ app.app_url }}" class="section" title="{% blocktranslate with name=app.name %}Models in the {{ name }} application{% endblocktranslate %}">
+            {% if app.app_label == 'auth' %}
+              {{ admin_labels.section.auth|default:app.name }}
+            {% elif app.app_label == 'comptabilite' %}
+              {{ admin_labels.section.comptabilite|default:app.name }}
+            {% elif app.app_label == 'parametres' %}
+              {{ admin_labels.section.parametres|default:app.name }}
+            {% else %}
+              {{ app.name }}
+            {% endif %}
+          </a>
+        </caption>
+        {% for model in app.models %}
+          <tr class="model-{{ model.object_name|lower }}{% if model.admin_url in request.path|urlencode %} current-model{% endif %}">
+            {% if model.admin_url %}
+              <th scope="row"><a href="{{ model.admin_url }}"{% if model.admin_url in request.path|urlencode %} aria-current="page"{% endif %}>
+                {% if app.app_label == 'comptabilite' %}
+                  {% if model.object_name|lower == 'devise' %}
+                    {{ admin_labels.model.Devise.name_plural|default:model.name }}
+                  {% elif model.object_name|lower == 'societe' %}
+                    {{ admin_labels.model.Societe.name_plural|default:model.name }}
+                  {% elif model.object_name|lower == 'naturecompte' %}
+                    {{ admin_labels.model.NatureCompte.name_plural|default:model.name }}
+                  {% elif model.object_name|lower == 'plancomptegroupe' %}
+                    {{ admin_labels.model.PlanCompteGroupe.name_plural|default:model.name }}
+                  {% elif model.object_name|lower == 'plancomptelocal' %}
+                    {{ admin_labels.model.PlanCompteLocal.name_plural|default:model.name }}
+                  {% elif model.object_name|lower == 'stade' %}
+                    {{ admin_labels.model.Stade.name_plural|default:model.name }}
+                  {% elif model.object_name|lower == 'typevaleur' %}
+                    {{ admin_labels.model.TypeValeur.name_plural|default:model.name }}
+                  {% else %}
+                    {{ model.name }}
+                  {% endif %}
+                {% else %}
+                  {{ model.name }}
+                {% endif %}
+              </a></th>
+            {% else %}
+              <th scope="row">
+                {% if app.app_label == 'comptabilite' %}
+                  {% if model.object_name|lower == 'devise' %}
+                    {{ admin_labels.model.Devise.name_plural|default:model.name }}
+                  {% elif model.object_name|lower == 'societe' %}
+                    {{ admin_labels.model.Societe.name_plural|default:model.name }}
+                  {% elif model.object_name|lower == 'naturecompte' %}
+                    {{ admin_labels.model.NatureCompte.name_plural|default:model.name }}
+                  {% elif model.object_name|lower == 'plancomptegroupe' %}
+                    {{ admin_labels.model.PlanCompteGroupe.name_plural|default:model.name }}
+                  {% elif model.object_name|lower == 'plancomptelocal' %}
+                    {{ admin_labels.model.PlanCompteLocal.name_plural|default:model.name }}
+                  {% elif model.object_name|lower == 'stade' %}
+                    {{ admin_labels.model.Stade.name_plural|default:model.name }}
+                  {% elif model.object_name|lower == 'typevaleur' %}
+                    {{ admin_labels.model.TypeValeur.name_plural|default:model.name }}
+                  {% else %}
+                    {{ model.name }}
+                  {% endif %}
+                {% else %}
+                  {{ model.name }}
+                {% endif %}
+              </th>
+            {% endif %}
+
+            {% if model.add_url %}
+              <td><a href="{{ model.add_url }}" class="addlink">{% translate 'Add' %}</a></td>
+            {% else %}
+              <td></td>
+            {% endif %}
+
+            {% if model.admin_url and show_changelinks %}
+              {% if model.view_only %}
+                <td><a href="{{ model.admin_url }}" class="viewlink">{% translate 'View' %}</a></td>
+              {% else %}
+                <td><a href="{{ model.admin_url }}" class="changelink">{% translate 'Change' %}</a></td>
+              {% endif %}
+            {% elif show_changelinks %}
+              <td></td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </table>
+    </div>
+  {% endfor %}
+{% else %}
+  <p>{% translate "You don't have permission to view or edit anything." %}</p>
+{% endif %}
+
+<script>
+// Script pour trier les modèles selon l'ordre défini
+document.addEventListener('DOMContentLoaded', function() {
+    // Ordres d'affichage des modèles (récupérés depuis AdminText)
+    const modelOrders = {{ admin_labels.model_orders|safe }};
+    
+    // Trier les modèles dans chaque section
+    document.querySelectorAll('.app-comptabilite table tbody').forEach(function(tbody) {
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        
+        // Trier les lignes selon l'ordre des modèles
+        rows.sort(function(a, b) {
+            const modelA = a.className.match(/model-(\w+)/);
+            const modelB = b.className.match(/model-(\w+)/);
+            
+            if (modelA && modelB) {
+                const orderA = modelOrders[modelA[1]] || 999;
+                const orderB = modelOrders[modelB[1]] || 999;
+                return orderA - orderB;
+            }
+            return 0;
+        });
+        
+        // Réorganiser les lignes dans le DOM
+        rows.forEach(function(row) {
+            tbody.appendChild(row);
+        });
+    });
+});
+</script>

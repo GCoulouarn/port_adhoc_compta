@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'django_filters',
     'comptabilite',
+    'parametres',
 ]
 
 MIDDLEWARE = [
@@ -54,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'comptabilite.middleware.AdminLabelMiddleware',
 ]
 
 ROOT_URLCONF = 'port_adhoc_compta.urls'
@@ -61,13 +63,14 @@ ROOT_URLCONF = 'port_adhoc_compta.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'comptabilite.context_processors.admin_labels',
             ],
         },
     },
