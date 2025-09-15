@@ -5,6 +5,18 @@ from .models import (
     PlanCompteLocal, Devise, Periode
 )
 
+# Configuration des sections de l'admin
+admin.site.site_header = "Port Adhoc Compta - Administration"
+admin.site.site_title = "Port Adhoc Compta"
+admin.site.index_title = "Gestion Comptable"
+
+# Configuration des sections
+class ReferentielAdminConfig:
+    """Configuration pour la section Référentiel"""
+    verbose_name = "Référentiel"
+    verbose_name_plural = "Référentiels"
+    app_label = "comptabilite"
+
 
 class AdminLabelMixin:
     """Mixin pour appliquer les libellés dynamiques aux modèles admin"""
@@ -132,7 +144,9 @@ class DeviseAdmin(AdminLabelMixin, admin.ModelAdmin):
 # SECTION RÉFÉRENTIEL
 # =============================================================================
 
-@admin.register(Periode)
+# Désinscrire Periode de l'admin principal (il sera dans la section Référentiel)
+# admin.site.unregister(Periode)
+
 class PeriodeAdmin(AdminLabelMixin, admin.ModelAdmin):
     list_display = ['id', 'periode_display', 'trimestre_display', 'date']
     list_filter = ['annee', 'mois', 'trimestre_civil']

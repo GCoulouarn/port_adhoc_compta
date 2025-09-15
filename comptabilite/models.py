@@ -187,6 +187,7 @@ class Periode(DynamicLabelsMixin, models.Model):
         verbose_name_plural = "Périodes"
         ordering = ['annee', 'mois']
         managed = False  # Table existante, ne pas gérer par Django
+        app_label = 'comptabilite'  # S'assurer que c'est dans l'app comptabilite
 
     def __str__(self):
         if self.annee and self.mois:

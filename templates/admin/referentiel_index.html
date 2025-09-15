@@ -1,0 +1,45 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a>
+</h1>
+{% endblock %}
+
+{% block content %}
+<div class="app-comptabilite module">
+    <table>
+        <caption>
+            <a href="#" class="section" title="Référentiel">Référentiel</a>
+        </caption>
+        <tbody>
+            {% for model in models %}
+            <tr class="model-{{ model.name|lower }}">
+                <th scope="row">
+                    <a href="{{ model.url }}">{{ model.name }}</a>
+                </th>
+                <td>
+                    <a href="{{ model.url }}" class="addlink">
+                        {% blocktrans with count=model.count %}{{ count }} {{ model.name|lower }}{% endblocktrans %}
+                    </a>
+                </td>
+                <td>
+                    <a href="{{ model.url }}add/" class="addlink">Ajouter</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="module">
+    <h2>Description</h2>
+    <p>La section Référentiel contient les données de référence utilisées dans l'application comptable :</p>
+    <ul>
+        <li><strong>Périodes :</strong> Gestion des périodes comptables (années, mois, trimestres)</li>
+    </ul>
+</div>
+{% endblock %}
