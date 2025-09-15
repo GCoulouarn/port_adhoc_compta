@@ -1,0 +1,84 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:perimetre_consolidation_perimetreconso_changelist' %}">{% trans 'Périmètres Consolidation' %}</a>
+&rsaquo; <a href="{% url 'admin:perimetre_consolidation_perimetreconso_change' perimetre.pk %}">{{ perimetre.get_display_name }}</a>
+&rsaquo; {% trans 'Sociétés' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<div class="module">
+    <h2>Sociétés liées au périmètre "{{ perimetre.get_display_name }}"</h2>
+    
+    {% if societes_liees %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Code</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for societe in societes_liees %}
+                <tr>
+                    <td>{{ societe.id }}</td>
+                    <td>{{ societe.nom }}</td>
+                    <td>{{ societe.code|default:"-" }}</td>
+                    <td>
+                        <form method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="remove">
+                            <input type="hidden" name="societe_id" value="{{ societe.id }}">
+                            <input type="submit" value="Retirer" class="deletelink" 
+                                   onclick="return confirm('Êtes-vous sûr de vouloir retirer cette société ?')">
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Aucune société liée à ce périmètre.</p>
+    {% endif %}
+</div>
+
+<div class="module">
+    <h2>Ajouter une société</h2>
+    
+    {% if societes_disponibles %}
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add">
+            <p>
+                <label for="societe_id">Sélectionner une société :</label>
+                <select name="societe_id" id="societe_id" required>
+                    <option value="">-- Choisir une société --</option>
+                    {% for societe in societes_disponibles %}
+                        <option value="{{ societe.id }}">{{ societe.nom }} ({{ societe.code|default:"Sans code" }})</option>
+                    {% endfor %}
+                </select>
+            </p>
+            <p>
+                <input type="submit" value="Ajouter la société" class="default">
+            </p>
+        </form>
+    {% else %}
+        <p>Toutes les sociétés sont déjà liées à ce périmètre.</p>
+    {% endif %}
+</div>
+
+<div class="submit-row">
+    <a href="{% url 'admin:perimetre_consolidation_perimetreconso_change' perimetre.pk %}" class="default">Retour au périmètre</a>
+</div>
+
+{% endblock %}

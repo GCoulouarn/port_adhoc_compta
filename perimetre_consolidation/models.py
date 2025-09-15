@@ -13,6 +13,7 @@ class PerimetreConsoSociete(DynamicLabelsMixin, models.Model):
         verbose_name_plural = "Périmètres Consolidation - Sociétés"
         unique_together = [['perimetre_conso', 'societe']]
         managed = False  # Table existante, ne pas gérer par Django
+        # Pas de clé primaire définie car la table n'en a pas
 
     def __str__(self):
         return f"{self.perimetre_conso} - {self.societe}"
