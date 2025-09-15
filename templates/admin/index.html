@@ -1,1 +1,159 @@
-{% extends "admin/index.html" %}
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a>
+</h1>
+{% endblock %}
+
+{% block content %}
+<div class="app-comptabilite module">
+    <table>
+        <caption>
+            <a href="#" class="section" title="Finance">Finance</a>
+        </caption>
+        <tbody>
+            <tr class="model-societe">
+                <th scope="row">
+                    <a href="{% url 'admin:comptabilite_societe_changelist' %}">Sociétés</a>
+                </th>
+                <td>
+                    <a href="{% url 'admin:comptabilite_societe_changelist' %}" class="addlink">
+                        {% blocktrans with count=societe_count %}{{ count }} sociétés{% endblocktrans %}
+                    </a>
+                </td>
+                <td>
+                    <a href="{% url 'admin:comptabilite_societe_add' %}" class="addlink">Ajouter</a>
+                </td>
+            </tr>
+            <tr class="model-devise">
+                <th scope="row">
+                    <a href="{% url 'admin:comptabilite_devise_changelist' %}">Devises</a>
+                </th>
+                <td>
+                    <a href="{% url 'admin:comptabilite_devise_changelist' %}" class="addlink">
+                        {% blocktrans with count=devise_count %}{{ count }} devises{% endblocktrans %}
+                    </a>
+                </td>
+                <td>
+                    <a href="{% url 'admin:comptabilite_devise_add' %}" class="addlink">Ajouter</a>
+                </td>
+            </tr>
+            <tr class="model-plancomptelocal">
+                <th scope="row">
+                    <a href="{% url 'admin:comptabilite_plancomptelocal_changelist' %}">Plans Comptables Locaux</a>
+                </th>
+                <td>
+                    <a href="{% url 'admin:comptabilite_plancomptelocal_changelist' %}" class="addlink">
+                        {% blocktrans with count=plancomptelocal_count %}{{ count }} comptes locaux{% endblocktrans %}
+                    </a>
+                </td>
+                <td>
+                    <a href="{% url 'admin:comptabilite_plancomptelocal_add' %}" class="addlink">Ajouter</a>
+                </td>
+            </tr>
+            <tr class="model-plancomptegroupe">
+                <th scope="row">
+                    <a href="{% url 'admin:comptabilite_plancomptegroupe_changelist' %}">Plans Comptables Groupes</a>
+                </th>
+                <td>
+                    <a href="{% url 'admin:comptabilite_plancomptegroupe_changelist' %}" class="addlink">
+                        {% blocktrans with count=plancomptegroupe_count %}{{ count }} groupes{% endblocktrans %}
+                    </a>
+                </td>
+                <td>
+                    <a href="{% url 'admin:comptabilite_plancomptegroupe_add' %}" class="addlink">Ajouter</a>
+                </td>
+            </tr>
+            <tr class="model-naturecompte">
+                <th scope="row">
+                    <a href="{% url 'admin:comptabilite_naturecompte_changelist' %}">Natures de Compte</a>
+                </th>
+                <td>
+                    <a href="{% url 'admin:comptabilite_naturecompte_changelist' %}" class="addlink">
+                        {% blocktrans with count=naturecompte_count %}{{ count }} natures{% endblocktrans %}
+                    </a>
+                </td>
+                <td>
+                    <a href="{% url 'admin:comptabilite_naturecompte_add' %}" class="addlink">Ajouter</a>
+                </td>
+            </tr>
+            <tr class="model-typevaleur">
+                <th scope="row">
+                    <a href="{% url 'admin:comptabilite_typevaleur_changelist' %}">Types de Valeur</a>
+                </th>
+                <td>
+                    <a href="{% url 'admin:comptabilite_typevaleur_changelist' %}" class="addlink">
+                        {% blocktrans with count=typevaleur_count %}{{ count }} types{% endblocktrans %}
+                    </a>
+                </td>
+                <td>
+                    <a href="{% url 'admin:comptabilite_typevaleur_add' %}" class="addlink">Ajouter</a>
+                </td>
+            </tr>
+            <tr class="model-stade">
+                <th scope="row">
+                    <a href="{% url 'admin:comptabilite_stade_changelist' %}">Stades</a>
+                </th>
+                <td>
+                    <a href="{% url 'admin:comptabilite_stade_changelist' %}" class="addlink">
+                        {% blocktrans with count=stade_count %}{{ count }} stades{% endblocktrans %}
+                    </a>
+                </td>
+                <td>
+                    <a href="{% url 'admin:comptabilite_stade_add' %}" class="addlink">Ajouter</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="app-referentiel module">
+    <table>
+        <caption>
+            <a href="/admin/referentiel/" class="section" title="Référentiel">Référentiel</a>
+        </caption>
+        <tbody>
+            <tr class="model-periode">
+                <th scope="row">
+                    <a href="/admin/referentiel/periode/">Périodes</a>
+                </th>
+                <td>
+                    <a href="/admin/referentiel/periode/" class="addlink">
+                        {% blocktrans with count=periode_count %}{{ count }} périodes{% endblocktrans %}
+                    </a>
+                </td>
+                <td>
+                    <a href="/admin/referentiel/periode/add/" class="addlink">Ajouter</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="app-parametres module">
+    <table>
+        <caption>
+            <a href="#" class="section" title="Paramètres">Paramètres</a>
+        </caption>
+        <tbody>
+            <tr class="model-admintext">
+                <th scope="row">
+                    <a href="{% url 'admin:comptabilite_admintext_changelist' %}">Libellés Admin</a>
+                </th>
+                <td>
+                    <a href="{% url 'admin:comptabilite_admintext_changelist' %}" class="addlink">
+                        {% blocktrans with count=admintext_count %}{{ count }} libellés{% endblocktrans %}
+                    </a>
+                </td>
+                <td>
+                    <a href="{% url 'admin:comptabilite_admintext_add' %}" class="addlink">Ajouter</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -71,6 +71,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'comptabilite.context_processors.admin_labels',
+                'comptabilite.context_processors_admin.admin_counts',
             ],
         },
     },

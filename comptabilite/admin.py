@@ -145,7 +145,10 @@ class DeviseAdmin(AdminLabelMixin, admin.ModelAdmin):
 # =============================================================================
 
 # Désinscrire Periode de l'admin principal (il sera dans la section Référentiel)
-# admin.site.unregister(Periode)
+try:
+    admin.site.unregister(Periode)
+except admin.sites.NotRegistered:
+    pass  # Le modèle n'est pas encore enregistré
 
 class PeriodeAdmin(AdminLabelMixin, admin.ModelAdmin):
     list_display = ['id', 'periode_display', 'trimestre_display', 'date']

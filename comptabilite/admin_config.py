@@ -38,3 +38,13 @@ referentiel_admin = ReferentielAdminSite(name='referentiel')
 # Configuration des modèles pour la section Référentiel
 from .admin import PeriodeAdmin
 referentiel_admin.register(Periode, PeriodeAdmin)
+
+# Ajouter un lien vers la section Référentiel dans l'admin principal
+def add_referentiel_link(request):
+    """Ajouter un lien vers la section Référentiel"""
+    return {
+        'referentiel_url': '/admin/referentiel/',
+    }
+
+# Enregistrer le context processor
+admin.site.index_template = 'admin/referentiel_index.html'
