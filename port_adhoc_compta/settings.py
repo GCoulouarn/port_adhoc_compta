@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django_filters',
     'comptabilite',
     'referentiel',
+    'perimetre_consolidation',
     'parametres',
 ]
 
