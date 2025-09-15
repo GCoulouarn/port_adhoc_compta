@@ -4,6 +4,7 @@ from comptabilite.dynamic_labels import DynamicLabelsMixin
 
 class PerimetreConsoSociete(DynamicLabelsMixin, models.Model):
     """Modèle pour la table de jointure entre périmètres de consolidation et sociétés"""
+    id = models.IntegerField(primary_key=True, db_column='PECSOC_Id', verbose_name="ID")
     perimetre_conso = models.ForeignKey('PerimetreConso', on_delete=models.CASCADE, db_column='PEC_Id', verbose_name="Périmètre Consolidation")
     societe = models.ForeignKey('comptabilite.Societe', on_delete=models.CASCADE, db_column='SOC_Id', verbose_name="Société")
 
@@ -13,10 +14,9 @@ class PerimetreConsoSociete(DynamicLabelsMixin, models.Model):
         verbose_name_plural = "Périmètres Consolidation - Sociétés"
         unique_together = [['perimetre_conso', 'societe']]
         managed = False  # Table existante, ne pas gérer par Django
-        # Pas de clé primaire définie car la table n'en a pas
 
     def __str__(self):
-        return f"{self.perimetre_conso} - {self.societe}"
+        return f"{self.societe.intitule}" if self.societe else "Société non définie"
 
 
 class PerimetreConso(DynamicLabelsMixin, models.Model):
