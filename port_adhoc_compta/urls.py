@@ -18,11 +18,9 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from comptabilite.admin_config import referentiel_admin
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('admin/referentiel/', referentiel_admin.urls),
     path('', include('comptabilite.urls')),
 ]
 

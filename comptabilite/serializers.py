@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import (
     Societe, Stade, NatureCompte, TypeValeur, PlanCompteGroupe,
-    PlanCompteLocal, Devise, Periode
+    PlanCompteLocal, Devise
 )
 
 
@@ -50,19 +50,6 @@ class PlanCompteLocalSerializer(serializers.ModelSerializer):
 class DeviseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Devise
-        fields = '__all__'
-
-
-# =============================================================================
-# SECTION RÉFÉRENTIEL
-# =============================================================================
-
-class PeriodeSerializer(serializers.ModelSerializer):
-    periode_display = serializers.CharField(source='get_periode_display', read_only=True)
-    trimestre_display = serializers.CharField(source='get_trimestre_display', read_only=True)
-    
-    class Meta:
-        model = Periode
         fields = '__all__'
 
 
