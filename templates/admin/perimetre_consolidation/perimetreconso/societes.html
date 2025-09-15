@@ -13,71 +13,198 @@
 {% endblock %}
 
 {% block content %}
-<h1>{{ title }}</h1>
+<style>
+.consolidation-form {
+    margin: 20px 0;
+}
+.consolidation-form h2 {
+    margin-bottom: 15px;
+    color: #333;
+}
+.field-row {
+    display: flex;
+    margin-bottom: 15px;
+    align-items: center;
+}
+.field-label {
+    font-weight: bold;
+    margin-right: 10px;
+    min-width: 80px;
+}
+.field-input {
+    flex: 1;
+    margin-right: 20px;
+}
+.field-input input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+.societes-section {
+    margin-top: 30px;
+}
+.societes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.societes-header h2 {
+    margin: 0;
+    color: #333;
+}
+.add-button {
+    background-color: #417690;
+    color: white;
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+}
+.add-button:hover {
+    background-color: #205067;
+}
+.societes-list {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.societe-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    background-color: #f9f9f9;
+}
+.societe-item:last-child {
+    border-bottom: none;
+}
+.societe-name {
+    flex: 1;
+    font-weight: 500;
+}
+.societe-actions {
+    margin-left: 15px;
+}
+.delete-button {
+    background-color: #ba2121;
+    color: white;
+    padding: 6px 12px;
+    text-decoration: none;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+}
+.delete-button:hover {
+    background-color: #a41515;
+}
+.add-form {
+    background-color: #f8f8f8;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-top: 15px;
+}
+.add-form select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+.add-form button {
+    background-color: #417690;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.add-form button:hover {
+    background-color: #205067;
+}
+</style>
 
-<div class="module">
-    <h2>Sociétés liées au périmètre "{{ perimetre.get_display_name }}"</h2>
-    
-    {% if societes_liees %}
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nom</th>
-                    <th>Code</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for societe in societes_liees %}
-                <tr>
-                    <td>{{ societe.id }}</td>
-                    <td>{{ societe.nom }}</td>
-                    <td>{{ societe.code|default:"-" }}</td>
-                    <td>
-                        <form method="post" style="display: inline;">
-                            {% csrf_token %}
-                            <input type="hidden" name="action" value="remove">
-                            <input type="hidden" name="societe_id" value="{{ societe.id }}">
-                            <input type="submit" value="Retirer" class="deletelink" 
-                                   onclick="return confirm('Êtes-vous sûr de vouloir retirer cette société ?')">
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>Aucune société liée à ce périmètre.</p>
-    {% endif %}
+<h1>Paramètre de consolidation</h1>
+
+<div class="consolidation-form">
+    <div class="field-row">
+        <span class="field-label">Code :</span>
+        <div class="field-input">
+            <input type="text" value="{{ perimetre.code|default:'' }}" readonly>
+        </div>
+        <span class="field-label">Libellé :</span>
+        <div class="field-input">
+            <input type="text" value="{{ perimetre.libelle|default:'' }}" readonly>
+        </div>
+    </div>
 </div>
 
-<div class="module">
-    <h2>Ajouter une société</h2>
+<div class="societes-section">
+    <div class="societes-header">
+        <h2>Liste des sociétés incluses</h2>
+        <button class="add-button" onclick="toggleAddForm()">Bouton Ajouter</button>
+    </div>
+    
+    <div class="societes-list">
+        {% if societes_liees %}
+            {% for societe in societes_liees %}
+            <div class="societe-item">
+                <span class="societe-name">{{ societe.nom }}</span>
+                <div class="societe-actions">
+                    <form method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="remove">
+                        <input type="hidden" name="societe_id" value="{{ societe.id }}">
+                        <button type="submit" class="delete-button" 
+                                onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette société ?')">
+                            Supprimer
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="societe-item">
+                <span class="societe-name">Aucune société liée</span>
+            </div>
+        {% endif %}
+    </div>
     
     {% if societes_disponibles %}
+    <div class="add-form" id="addForm" style="display: none;">
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="add">
-            <p>
-                <label for="societe_id">Sélectionner une société :</label>
-                <select name="societe_id" id="societe_id" required>
-                    <option value="">-- Choisir une société --</option>
-                    {% for societe in societes_disponibles %}
-                        <option value="{{ societe.id }}">{{ societe.nom }} ({{ societe.code|default:"Sans code" }})</option>
-                    {% endfor %}
-                </select>
-            </p>
-            <p>
-                <input type="submit" value="Ajouter la société" class="default">
-            </p>
+            <select name="societe_id" id="societe_id" required>
+                <option value="">-- Choisir une société --</option>
+                {% for societe in societes_disponibles %}
+                    <option value="{{ societe.id }}">{{ societe.nom }} ({{ societe.code|default:"Sans code" }})</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Ajouter la société</button>
+            <button type="button" onclick="toggleAddForm()" style="background-color: #666; margin-left: 10px;">Annuler</button>
         </form>
-    {% else %}
-        <p>Toutes les sociétés sont déjà liées à ce périmètre.</p>
+    </div>
     {% endif %}
 </div>
 
-<div class="submit-row">
+<script>
+function toggleAddForm() {
+    var form = document.getElementById('addForm');
+    if (form.style.display === 'none') {
+        form.style.display = 'block';
+    } else {
+        form.style.display = 'none';
+    }
+}
+</script>
+
+<div class="submit-row" style="margin-top: 30px;">
     <a href="{% url 'admin:perimetre_consolidation_perimetreconso_change' perimetre.pk %}" class="default">Retour au périmètre</a>
 </div>
 
