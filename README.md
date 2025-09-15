@@ -1,170 +1,274 @@
-# Port Adhoc Compta
+# 🏦 Port Adhoc Compta
 
-Application web Django de gestion comptable, migrée depuis une application C# WinForms.
+> Application Django de gestion comptable avec libellés dynamiques et interface personnalisable
 
-## 🚀 Fonctionnalités
+[![Django](https://img.shields.io/badge/Django-5.0.6-green.svg)](https://djangoproject.com/)
+[![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://python.org/)
+[![SQL Server](https://img.shields.io/badge/SQL%20Server-2019+-red.svg)](https://microsoft.com/sql-server)
 
-- **Gestion des sociétés** : CRUD complet avec tri et filtrage
-- **Gestion des devises** : CRUD complet avec tri et filtrage
-- **Système d'authentification** : Connexion, inscription, gestion des profils
-- **Gestion des permissions** : Groupes d'utilisateurs avec droits spécifiques
-- **Interface responsive** : Bootstrap 5 pour une expérience utilisateur optimale
-- **API REST** : Endpoints pour l'intégration avec d'autres systèmes
-- **Base de données SQL Server** : Intégration avec mssql-django
+## ✨ Fonctionnalités principales
 
-## 🛠️ Technologies
+### 🎨 **Interface personnalisable**
+- **Libellés dynamiques** : Tous les textes de l'interface sont modifiables
+- **Ordre d'affichage** : Contrôle total de l'ordre des modèles par section
+- **Sections personnalisées** : "Comptabilité" → "Finance Consolidation"
+- **Templates sur mesure** : Interface d'administration entièrement personnalisée
 
-- **Backend** : Django 5.2.6, Django REST Framework
-- **Base de données** : SQL Server (mssql-django, pyodbc)
-- **Frontend** : HTML5, CSS3, JavaScript, Bootstrap 5
-- **Authentification** : Django Auth avec groupes et permissions
-- **API** : Django REST Framework
+### 🏢 **Gestion comptable**
+- **Sociétés** : Gestion complète avec relation aux devises
+- **Devises** : Support multi-devises (EUR, USD, etc.)
+- **Plans comptables** : Groupes et plans locaux
+- **Natures de comptes** : Classification des comptes
 
-## 📋 Prérequis
+### 🔧 **Administration avancée**
+- **Filtres intelligents** : Par devise, groupe, statut
+- **Recherche globale** : Par code, intitulé, devise
+- **Formulaires organisés** : Champs groupés par catégorie
+- **Interface responsive** : Optimisée pour tous les écrans
 
-- Python 3.8+
-- SQL Server
-- pip
+## 🚀 Démarrage rapide
 
-## 🔧 Installation
+### Prérequis
+- Python 3.12+
+- SQL Server 2019+
+- Git
 
-1. **Cloner le projet**
-   ```bash
-   git clone <repository-url>
-   cd port_adhoc_compta
-   ```
+### Installation
 
-2. **Créer un environnement virtuel**
-   ```bash
-   python -m venv port_adhoc_compta_env
-   source port_adhoc_compta_env/bin/activate  # Linux/Mac
-   # ou
-   port_adhoc_compta_env\Scripts\activate  # Windows
-   ```
+```bash
+# 1. Cloner le repository
+git clone https://github.com/GCoulouarn/port_adhoc_compta.git
+cd port_adhoc_compta
 
-3. **Installer les dépendances**
-   ```bash
-   pip install -r requirements.txt
-   ```
+# 2. Créer l'environnement virtuel
+python -m venv .venv
+source .venv/bin/activate  # Linux/Mac
+# ou .venv\Scripts\activate  # Windows
 
-4. **Configurer la base de données**
-   - Modifier les paramètres de connexion dans `port_adhoc_compta/settings.py`
-   - Host: `172.31.0.5,60322`
-   - Database: `TEST_TDB`
-   - User: `Dev_Cube_Web`
-   - Password: `G4L|pK$9tbal`
+# 3. Installer les dépendances
+pip install -r requirements.txt
 
-5. **Appliquer les migrations**
-   ```bash
-   python manage.py migrate
-   ```
+# 4. Configuration de la base de données
+cp .env.example .env
+# Modifier .env avec vos paramètres SQL Server
 
-6. **Créer un superutilisateur**
-   ```bash
-   python manage.py createsuperuser
-   ```
+# 5. Migrations
+python manage.py migrate
 
-7. **Configurer les permissions**
-   ```bash
-   python setup_permissions.py
-   ```
+# 6. Créer un superutilisateur
+python manage.py createsuperuser
 
-8. **Lancer le serveur**
-   ```bash
-   python manage.py runserver
-   ```
+# 7. Démarrer le serveur
+python manage.py runserver
+```
 
-## 🌐 Accès
+### Accès
+- **Application** : http://localhost:8000/
+- **Administration** : http://localhost:8000/admin/
 
-- **Application** : http://localhost:8000
-- **Administration** : http://localhost:8000/admin
+## 📋 Configuration
 
-## 👥 Utilisateurs par défaut
+### Variables d'environnement (.env)
+```env
+# Base de données SQL Server
+DB_ENGINE=mssql
+DB_HOST=your-server
+DB_PORT=1433
+DB_NAME=your-database
+DB_USER=your-username
+DB_PASSWORD=your-password
 
-- **Superutilisateur** : `admin` / `admin123`
-- **Gestionnaire** : `Gilles` / `gilles123` (groupe "Gestionnaires")
+# Django
+SECRET_KEY=your-secret-key
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+```
+
+### Configuration des libellés
+1. Accéder à **Admin** → **Paramètres** → **Libellés Admin**
+2. Modifier les libellés selon vos besoins :
+   - `site.title` : Titre du site
+   - `section.comptabilite` : Nom de la section comptabilité
+   - `model.Devise.name_plural` : Libellé des devises
+3. Ajuster l'ordre d'affichage des modèles
+
+## 🏗️ Architecture
+
+### Applications
+- **`comptabilite/`** : Gestion comptable principale
+- **`parametres/`** : Gestion des libellés et paramètres
+
+### Composants clés
+- **`AdminLabelMiddleware`** : Application des libellés dynamiques
+- **`admin_labels`** : Context processor pour les templates
+- **Templates personnalisés** : Interface d'administration sur mesure
 
 ## 📊 Modèles de données
 
-### Societe
-- `id` : Identifiant unique (non auto-incrémenté)
-- `code` : Code de la société
-- `intitule` : Nom de la société
-- `groupe` : Indique si c'est un groupe
-- `archive` : Indique si archivé
-- `devise_id` : Référence vers la devise
-
-### Devise
-- `id` : Identifiant unique (non auto-incrémenté)
-- `code_iso` : Code ISO à 3 lettres
-- `intitule` : Nom de la devise
-- `sigle` : Symbole de la devise
-
-## 🔐 Permissions
-
-Le système utilise les permissions Django standard :
-- `add_societe`, `change_societe`, `delete_societe`, `view_societe`
-- `add_devise`, `change_devise`, `delete_devise`, `view_devise`
-
-## 🎯 Fonctionnalités principales
-
-### Gestion des sociétés
-- Liste avec tri par colonnes (ID, code, intitulé, groupe, archivé)
-- Filtrage par recherche, type (groupe/société), statut (archivé/actif)
-- Création, modification, suppression avec permissions
-- Sélection de devise via dropdown
-
-### Gestion des devises
-- Liste avec tri par colonnes (ID, code ISO, intitulé, sigle)
-- Filtrage par recherche
-- Création, modification, suppression avec permissions
-
-### Système d'authentification
-- Connexion/déconnexion
-- Inscription d'utilisateurs
-- Gestion des profils
-- Groupes avec permissions spécifiques
-
-## 🔧 Configuration
-
-### Base de données
+### Sociétés
 ```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'mssql',
-        'NAME': 'TEST_TDB',
-        'HOST': '172.31.0.5,60322',
-        'USER': 'Dev_Cube_Web',
-        'PASSWORD': 'G4L|pK$9tbal',
-        'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server',
-        },
-    }
-}
+class Societe(models.Model):
+    code = models.CharField(max_length=20)
+    intitule = models.CharField(max_length=100)
+    devise = models.ForeignKey('Devise', ...)  # Relation vers devise
+    groupe = models.CharField(max_length=50)
+    archive = models.BooleanField(default=False)
 ```
 
-### Permissions
-Les permissions sont configurées via le script `setup_permissions.py` qui :
-- Crée les permissions manquantes pour les devises
-- Assigne les permissions au groupe "Gestionnaires"
+### Devises
+```python
+class Devise(models.Model):
+    code_iso = models.CharField(max_length=3)
+    intitule = models.CharField(max_length=20)
+    sigle = models.CharField(max_length=3)
+```
 
-## 📝 Notes techniques
+### Libellés dynamiques
+```python
+class AdminText(models.Model):
+    language = models.CharField(max_length=5, default='fr')
+    key = models.CharField(max_length=100)
+    value = models.CharField(max_length=255)
+    display_order = models.IntegerField(default=0)
+```
 
-- **Clés primaires non auto-incrémentées** : Gestion manuelle des IDs via requêtes SQL
-- **Templates personnalisés** : Interface d'administration Django personnalisée
-- **Tri dynamique** : URLs avec paramètres `sort` et `order`
-- **Filtrage** : Utilisation de `Q` objects pour les requêtes complexes
-- **Responsive design** : Bootstrap 5 pour l'adaptabilité mobile
+## 🎨 Personnalisation
 
-## 🚀 Déploiement
+### Modifier les libellés
+1. **Interface admin** : Admin → Paramètres → Libellés Admin
+2. **Clés disponibles** :
+   - `site.title` : Titre du site
+   - `site.header` : En-tête de l'admin
+   - `section.comptabilite` : Nom de la section comptabilité
+   - `model.*.name_plural` : Libellés des modèles
 
-Pour un déploiement en production :
-1. Configurer les variables d'environnement
-2. Utiliser un serveur WSGI/ASGI (Gunicorn, uWSGI)
-3. Configurer un serveur web (Nginx, Apache)
-4. Utiliser une base de données de production
-5. Configurer HTTPS et la sécurité
+### Ajouter de nouveaux modèles
+1. Créer le modèle avec `DynamicLabelsMixin`
+2. Ajouter l'admin avec `AdminLabelMixin`
+3. Créer les libellés dans `AdminText`
+4. Mettre à jour `templates/admin/app_list.html`
 
-## 📞 Support
+## 🔧 Développement
 
-Pour toute question ou problème, consultez la documentation Django ou contactez l'équipe de développement.
+### Structure du projet
+```
+port_adhoc_compta/
+├── comptabilite/          # App principale
+│   ├── models.py         # Modèles comptables
+│   ├── admin.py          # Configuration admin
+│   ├── middleware.py     # Middleware libellés
+│   └── context_processors.py
+├── parametres/           # App paramètres
+│   ├── models.py         # Modèle AdminText
+│   └── admin.py          # Admin des libellés
+├── templates/admin/      # Templates personnalisés
+├── requirements.txt      # Dépendances Python
+└── DOCUMENTATION.md      # Documentation complète
+```
+
+### Commandes utiles
+```bash
+# Vérifier la configuration
+python manage.py check
+
+# Créer des migrations
+python manage.py makemigrations
+
+# Appliquer les migrations
+python manage.py migrate
+
+# Collecter les fichiers statiques
+python manage.py collectstatic
+
+# Créer un superutilisateur
+python manage.py createsuperuser
+```
+
+## 🐛 Dépannage
+
+### Problèmes courants
+
+**Libellés non appliqués**
+- Vérifier que `AdminLabelMiddleware` est dans `MIDDLEWARE`
+- Vérifier que `admin_labels` est dans les context processors
+
+**Erreurs de base de données**
+- Vérifier la connexion SQL Server
+- Exécuter `python manage.py migrate`
+
+**Ordre d'affichage incorrect**
+- Vérifier les valeurs `display_order` dans `AdminText`
+- Vérifier que le JavaScript est chargé
+
+### Logs et débogage
+```bash
+# Mode debug
+python manage.py runserver --verbosity=2
+
+# Vérifier les migrations
+python manage.py showmigrations
+
+# Shell Django
+python manage.py shell
+```
+
+## 📈 Performance
+
+### Optimisations
+- **Cache des libellés** : Évite les requêtes répétées
+- **Middleware optimisé** : Exécution uniquement sur les requêtes admin
+- **Requêtes groupées** : Récupération de tous les libellés en une fois
+
+### Métriques recommandées
+- **Temps de réponse** : < 200ms pour les pages admin
+- **Requêtes DB** : < 10 par page admin
+
+## 🔒 Sécurité
+
+### Mesures implémentées
+- Authentification Django standard
+- Protection CSRF
+- Validation des données d'entrée
+- Permissions par modèle
+
+### Recommandations production
+- Utiliser HTTPS
+- Variables d'environnement pour les secrets
+- Sauvegarde régulière de la base de données
+
+## 📚 Documentation
+
+- **[Documentation complète](DOCUMENTATION.md)** : Guide détaillé du projet
+- **[API Django](https://docs.djangoproject.com/)** : Documentation officielle Django
+- **[SQL Server](https://docs.microsoft.com/sql/)** : Documentation Microsoft SQL Server
+
+## 🤝 Contribution
+
+1. Fork le repository
+2. Créer une branche feature (`git checkout -b feature/nouvelle-fonctionnalite`)
+3. Commiter les changements (`git commit -am 'Ajout nouvelle fonctionnalité'`)
+4. Pousser vers la branche (`git push origin feature/nouvelle-fonctionnalite`)
+5. Créer une Pull Request
+
+## 📄 Licence
+
+Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+
+## 👨‍💻 Auteur
+
+**Gilles Coulouarn**
+- GitHub: [@GCoulouarn](https://github.com/GCoulouarn)
+- Email: [votre-email@example.com]
+
+## 🙏 Remerciements
+
+- [Django](https://djangoproject.com/) - Framework web Python
+- [Microsoft SQL Server](https://microsoft.com/sql-server) - Base de données
+- [Bootstrap](https://getbootstrap.com/) - Framework CSS
+
+---
+
+**Version** : 1.0.0  
+**Dernière mise à jour** : 15 septembre 2025  
+**Django** : 5.0.6  
+**Python** : 3.12+
