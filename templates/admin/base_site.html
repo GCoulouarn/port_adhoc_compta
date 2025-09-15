@@ -1,0 +1,15 @@
+{% extends "admin/base.html" %}
+
+{% block extrahead %}
+  {{ block.super }}
+  <style>
+    /* Masque le sélecteur de langue natif du Django admin */
+    #user-tools form[action$="/setlang/"] { display: none !important; }
+  </style>
+{% endblock %}
+
+{% block branding %}
+  {{ block.super }}
+{% endblock %}
+
+
