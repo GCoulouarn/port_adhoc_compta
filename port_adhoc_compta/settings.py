@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'django_filters',
     'comptabilite',
-    'comptabilite.referentiel',
+    'referentiel',
     'parametres',
 ]
 

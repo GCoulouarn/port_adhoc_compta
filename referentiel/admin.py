@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Periode
-from ..admin import AdminLabelMixin
+from comptabilite.admin import AdminLabelMixin
 
 
 @admin.register(Periode)

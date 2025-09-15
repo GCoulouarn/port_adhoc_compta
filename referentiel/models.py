@@ -1,5 +1,5 @@
 from django.db import models
-from ..dynamic_labels import DynamicLabelsMixin
+from comptabilite.dynamic_labels import DynamicLabelsMixin
 
 
 class Periode(DynamicLabelsMixin, models.Model):
@@ -16,7 +16,6 @@ class Periode(DynamicLabelsMixin, models.Model):
         verbose_name_plural = "Périodes"
         ordering = ['annee', 'mois']
         managed = False  # Table existante, ne pas gérer par Django
-        app_label = 'referentiel'  # Appartenir à la section Référentiel
 
     def __str__(self):
         if self.annee and self.mois:
