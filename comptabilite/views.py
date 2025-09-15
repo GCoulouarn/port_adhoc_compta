@@ -19,11 +19,11 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from .models import (
     Societe, Stade, NatureCompte, TypeValeur, PlanCompteGroupe,
-    PlanCompteLocal, Devise
+    PlanCompteLocal, Devise, Periode
 )
 from .serializers import (
     SocieteSerializer, StadeSerializer, NatureCompteSerializer, TypeValeurSerializer,
-    PlanCompteGroupeSerializer, PlanCompteLocalSerializer, DeviseSerializer
+    PlanCompteGroupeSerializer, PlanCompteLocalSerializer, DeviseSerializer, PeriodeSerializer
 )
 # from .filters import FinanceFaitsFilter
 
@@ -450,6 +450,22 @@ class DeviseViewSet(viewsets.ModelViewSet):
     search_fields = ['code_iso', 'intitule', 'sigle']
     ordering_fields = ['id', 'code_iso', 'intitule']
     ordering = ['code_iso']
+
+
+# =============================================================================
+# SECTION RÉFÉRENTIEL
+# =============================================================================
+
+class PeriodeViewSet(viewsets.ModelViewSet):
+    """API pour les périodes"""
+    queryset = Periode.objects.all()
+    serializer_class = PeriodeSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['annee', 'mois', 'trimestre_civil']
+    search_fields = ['annee', 'mois']
+    ordering_fields = ['id', 'annee', 'mois', 'date']
+    ordering = ['annee', 'mois']
 
 
 # API pour les tiers et versions sera ajoutée plus tard
