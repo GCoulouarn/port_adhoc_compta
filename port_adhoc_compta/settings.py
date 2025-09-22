@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_extensions',
     'django_filters',
+    'import_export',
     'comptabilite',
     'referentiel',
     'perimetre_consolidation',
