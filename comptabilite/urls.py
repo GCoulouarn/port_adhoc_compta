@@ -36,6 +36,15 @@ urlpatterns = [
     path('logout/', views.user_logout, name='logout'),
     path('register/', views.user_register, name='register'),
     path('profile/', views.user_profile, name='profile'),
+            # Ecritures
+            path('ecritures/recherche/', views.ecritures_recherche, name='ecritures_recherche'),
+            path('ecritures/import/', views.ecritures_import, name='ecritures_import'),
+            path('ecritures/import-sage/', views.ecritures_import_sage, name='ecritures_import_sage'),
+            path('ecritures/import-file/', views.ecritures_import_file, name='ecritures_import_file'),
+            path('ecritures/template/', views.ecritures_template, name='ecritures_template'),
+            
+            # Import Excel dédié
+            path('import-excel/', views.import_excel, name='import_excel'),
     
     # path('ecritures/', views.FinanceFaitsListView.as_view(), name='finance_faits_list'),
     

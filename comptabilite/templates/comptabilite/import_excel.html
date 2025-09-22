@@ -1,0 +1,223 @@
+{% extends 'comptabilite/base.html' %}
+
+{% block title %}Import de fichier Excel{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Import de fichier Excel</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{% url 'comptabilite:ecritures_recherche' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Retour à la recherche
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-upload me-2"></i>
+                    Import de fichier Excel
+                </h6>
+            </div>
+            <div class="card-body">
+                <form id="excelImportForm" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <!-- Sélection de fichier -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <label for="excel_file" class="form-label fw-bold">Sélectionner un fichier Excel :</label>
+                            <input type="file" class="form-control" id="excel_file" name="excel_file" accept=".xlsx,.xls" required>
+                            <div class="form-text">
+                                Formats acceptés : .xlsx, .xls
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Informations sur l'import -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Information :</strong> Le fichier Excel sera importé dans la table temporaire <code>T_Temp_ImportBudgetExcel</code>.
+                                Les données existantes dans cette table seront remplacées.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bouton d'import -->
+                    <div class="row">
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-upload me-2"></i>
+                                Importer le fichier Excel
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                
+                <!-- Zone de notification -->
+                <div id="notificationZone" class="mt-4" style="display: none;">
+                    <div id="notificationContent" class="alert"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Résultats d'import -->
+        <div id="importResults" class="card mt-4" style="display: none;">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Résultats de l'import
+                </h6>
+            </div>
+            <div class="card-body">
+                <div id="importResultsContent"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Instructions
+                </h6>
+            </div>
+            <div class="card-body">
+                <h6>Format du fichier Excel :</h6>
+                <p>Le fichier Excel doit contenir les colonnes suivantes :</p>
+                <ul class="list-unstyled small">
+                    <li><code>Societe</code> - Code société</li>
+                    <li><code>Annee</code> - Année</li>
+                    <li><code>Version</code> - Version</li>
+                    <li><code>CompteGeneral</code> - Compte général</li>
+                    <li><code>Section</code> - Section</li>
+                    <li><code>GroupeCode</code> - Code groupe</li>
+                    <li><code>RefactCode</code> - Code refacturation</li>
+                    <li><code>Parametre</code> - Paramètre</li>
+                    <li><code>Periode</code> - Période</li>
+                    <li><code>Valeur</code> - Valeur</li>
+                    <li><code>SOC_Id</code> - ID société</li>
+                    <li><code>SocieteNom</code> - Nom société</li>
+                    <li><code>CompteIntitule</code> - Intitulé compte</li>
+                    <li><code>PLG_Code</code> - Code PLG</li>
+                    <li><code>PLG_Intitule</code> - Intitulé PLG</li>
+                    <li><code>NCT_Intitule</code> - Intitulé NCT</li>
+                    <li><code>NCT_Code</code> - Code NCT</li>
+                    <li><code>SIG_Code</code> - Code SIG</li>
+                    <li><code>SIG_Intitule</code> - Intitulé SIG</li>
+                    <li><code>TFT_code</code> - Code TFT</li>
+                    <li><code>TFT_Intitule</code> - Intitulé TFT</li>
+                    <li><code>BLN_code</code> - Code BLN</li>
+                    <li><code>BLN_Intitule</code> - Intitulé BLN</li>
+                    <li><code>TypeValeur</code> - Type de valeur</li>
+                </ul>
+                
+                <div class="alert alert-warning mt-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Note :</strong> Les colonnes peuvent être vides, mais la structure doit être respectée.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Gestion du formulaire d'import Excel
+document.getElementById('excelImportForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    handleExcelImport();
+});
+
+// Fonction pour gérer l'import Excel
+function handleExcelImport() {
+    const fileInput = document.getElementById('excel_file');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        showNotification('Merci de sélectionner un fichier Excel', 'danger');
+        return;
+    }
+    
+    // Vérifier l'extension du fichier
+    const allowedExtensions = ['.xlsx', '.xls'];
+    const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
+    
+    if (!allowedExtensions.includes(fileExtension)) {
+        showNotification('Seuls les fichiers Excel (.xlsx, .xls) sont acceptés', 'danger');
+        return;
+    }
+    
+    // Préparer les données
+    const formData = new FormData(document.getElementById('excelImportForm'));
+    
+    // Afficher un indicateur de chargement
+    const submitBtn = document.querySelector('#excelImportForm button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Import en cours...';
+    submitBtn.disabled = true;
+    
+    showNotification('Import en cours...', 'info');
+    
+    fetch('{% url "comptabilite:import_excel" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification(data.message, 'success');
+            showImportResults(data);
+        } else {
+            showNotification('Erreur : ' + data.error, 'danger');
+        }
+    })
+    .catch(error => {
+        showNotification('Erreur lors de l\'import : ' + error, 'danger');
+    })
+    .finally(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+}
+
+// Fonction pour afficher les notifications
+function showNotification(message, type) {
+    const notificationZone = document.getElementById('notificationZone');
+    const notificationContent = document.getElementById('notificationContent');
+    
+    notificationContent.className = `alert alert-${type}`;
+    notificationContent.innerHTML = message;
+    notificationZone.style.display = 'block';
+    
+    // Auto-masquer après 5 secondes pour les succès
+    if (type === 'success') {
+        setTimeout(() => {
+            notificationZone.style.display = 'none';
+        }, 5000);
+    }
+}
+
+// Afficher les résultats d'import Excel
+function showImportResults(data) {
+    let content = '<div class="alert alert-success"><i class="fas fa-check-circle me-2"></i>Import Excel réussi !</div>';
+    content += '<ul class="list-unstyled">';
+    content += '<li><strong>Lignes importées :</strong> ' + (data.rows_imported || 0) + '</li>';
+    content += '<li><strong>Table de destination :</strong> T_Temp_ImportBudgetExcel</li>';
+    content += '<li><strong>Statut :</strong> Données temporaires prêtes pour traitement</li>';
+    content += '</ul>';
+    
+    document.getElementById('importResultsContent').innerHTML = content;
+    document.getElementById('importResults').style.display = 'block';
+}
+</script>
+{% endblock %}

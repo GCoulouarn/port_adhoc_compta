@@ -1,0 +1,232 @@
+{% extends 'comptabilite/base.html' %}
+
+{% block title %}Gestion des Écritures Comptables{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Gestion des Écritures Comptables</h1>
+</div>
+
+        <!-- Bouton d'import Excel -->
+        <div class="d-flex justify-content-end mb-3">
+            <a href="{% url 'comptabilite:import_excel' %}" class="btn btn-primary">
+                <i class="fas fa-upload me-2"></i>Importer un fichier Excel
+            </a>
+        </div>
+
+        <!-- Contenu de recherche -->
+
+<div class="card mb-4">
+    <div class="card-header">Filtres</div>
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            {% csrf_token %}
+            <div class="col-md-3">{{ form.per_id.label_tag }} {{ form.per_id }}</div>
+            <div class="col-md-3">{{ form.sta_id.label_tag }} {{ form.sta_id }}</div>
+            <div class="col-md-3">{{ form.soc_id.label_tag }} {{ form.soc_id }}</div>
+            <div class="col-md-3">{{ form.tyv_id.label_tag }} {{ form.tyv_id }}</div>
+            <div class="col-md-3">{{ form.pcl_compte.label_tag }} {{ form.pcl_compte }}</div>
+            <div class="col-md-3">{{ form.fin_solde.label_tag }} {{ form.fin_solde }}</div>
+            <div class="col-md-2">{{ form.ax1_code.label_tag }} {{ form.ax1_code }}</div>
+            <div class="col-md-2">{{ form.ax2_code.label_tag }} {{ form.ax2_code }}</div>
+            <div class="col-md-2">{{ form.ax3_code.label_tag }} {{ form.ax3_code }}</div>
+            <div class="col-12 d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-primary">Rechercher</button>
+                {% if rows and columns %}
+                <button type="button" class="btn btn-success" onclick="passerEcritures()">
+                    <i class="fas fa-check me-1"></i>
+                    Passer les écritures
+                </button>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+    <!-- Indicateur d'équilibre -->
+    <div id="equilibre-status" class="alert alert-info m-3" style="display: none;">
+        <i class="fas fa-balance-scale me-2"></i>
+        <span id="equilibre-message"></span>
+    </div>
+    
+    {% if form.errors %}
+    <div class="alert alert-danger m-3">
+        {{ form.errors }}
+    </div>
+    {% endif %}
+    {% if rows and columns %}
+    <div class="table-responsive p-3">
+        <table class="table table-striped table-sm">
+            <thead>
+                <tr>
+                    {% if display_columns %}
+                        {% for col in display_columns %}
+                        <th>{{ col }}</th>
+                        {% endfor %}
+                    {% else %}
+                        {% for col in columns %}
+                        <th>{{ col }}</th>
+                        {% endfor %}
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    {% for cell in row %}
+                    <td>{{ cell }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+            {% elif request.GET %}
+            <div class="alert alert-info m-3">Aucun résultat.</div>
+            {% endif %}
+
+<!-- Modal de confirmation pour passer les écritures -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer l'import</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir passer ces écritures ?</p>
+                <div id="equilibre-check" class="alert alert-warning" style="display: none;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span id="equilibre-warning"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-success" id="confirmImport">Confirmer</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function passerEcritures() {
+    // Vérifier l'équilibre avant d'afficher la confirmation
+    checkEquilibre().then(function(isBalanced) {
+        if (!isBalanced) {
+            document.getElementById('equilibre-warning').textContent = 
+                'Attention : Les écritures ne sont pas équilibrées !';
+            document.getElementById('equilibre-check').style.display = 'block';
+        } else {
+            document.getElementById('equilibre-check').style.display = 'none';
+        }
+        
+        // Afficher le modal de confirmation
+        var modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        modal.show();
+    });
+}
+
+function checkEquilibre() {
+    // Calculer l'équilibre des écritures affichées
+    var rows = document.querySelectorAll('tbody tr');
+    var totalDebit = 0;
+    var totalCredit = 0;
+    
+    // Trouver les colonnes de montant (adaptation selon la structure)
+    var montantIndex = -1;
+    var soldeIndex = -1;
+    
+    var headers = document.querySelectorAll('thead th');
+    for (var i = 0; i < headers.length; i++) {
+        var text = headers[i].textContent.toLowerCase();
+        if (text.includes('montant')) montantIndex = i;
+        if (text.includes('solde')) soldeIndex = i;
+    }
+    
+    rows.forEach(function(row) {
+        var cells = row.querySelectorAll('td');
+        if (montantIndex >= 0 && cells[montantIndex]) {
+            var value = parseFloat(cells[montantIndex].textContent.replace(/[^\d.-]/g, '')) || 0;
+            if (value > 0) totalDebit += value;
+            else if (value < 0) totalCredit += Math.abs(value);
+        }
+    });
+    
+    var isBalanced = Math.abs(totalDebit - totalCredit) < 0.01; // Tolérance de 1 centime
+    
+    // Afficher le statut d'équilibre
+    var statusDiv = document.getElementById('equilibre-status');
+    var messageDiv = document.getElementById('equilibre-message');
+    
+    if (isBalanced) {
+        statusDiv.className = 'alert alert-success m-3';
+        messageDiv.innerHTML = '<i class="fas fa-check me-2"></i>Écritures équilibrées (Débit: ' + 
+            totalDebit.toFixed(2) + '€, Crédit: ' + totalCredit.toFixed(2) + '€)';
+    } else {
+        statusDiv.className = 'alert alert-danger m-3';
+        messageDiv.innerHTML = '<i class="fas fa-times me-2"></i>Écritures non équilibrées (Débit: ' + 
+            totalDebit.toFixed(2) + '€, Crédit: ' + totalCredit.toFixed(2) + '€, Écart: ' + 
+            Math.abs(totalDebit - totalCredit).toFixed(2) + '€)';
+    }
+    statusDiv.style.display = 'block';
+    
+    return Promise.resolve(isBalanced);
+}
+
+// Confirmer l'import
+document.getElementById('confirmImport').addEventListener('click', function() {
+    // Appeler l'action d'import
+    fetch('{% url "comptabilite:ecritures_import" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            // Paramètres de la recherche actuelle
+            per_id: document.querySelector('[name=per_id]').value,
+            sta_id: document.querySelector('[name=sta_id]').value,
+            soc_id: document.querySelector('[name=soc_id]').value,
+            tyv_id: document.querySelector('[name=tyv_id]').value,
+            pcl_compte: document.querySelector('[name=pcl_compte]').value,
+            fin_solde: document.querySelector('[name=fin_solde]').value,
+            ax1_code: document.querySelector('[name=ax1_code]').value,
+            ax2_code: document.querySelector('[name=ax2_code]').value,
+            ax3_code: document.querySelector('[name=ax3_code]').value,
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Écritures importées avec succès !');
+            location.reload();
+        } else {
+            alert('Erreur lors de l\'import : ' + data.error);
+        }
+    })
+    .catch(error => {
+        alert('Erreur : ' + error);
+    });
+    
+    // Fermer le modal
+    var modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
+    modal.hide();
+});
+
+        // Vérifier l'équilibre au chargement de la page
+        document.addEventListener('DOMContentLoaded', function() {
+            if (document.querySelectorAll('tbody tr').length > 0) {
+                checkEquilibre();
+            }
+        });
+
+
+
+// Télécharger le modèle
+function downloadTemplate() {
+    window.open('{% url "comptabilite:ecritures_template" %}', '_blank');
+}
+</script>
+{% endblock %}
+
+

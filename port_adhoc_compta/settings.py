@@ -91,10 +91,12 @@ DATABASES = {
         'NAME': 'TEST_TDB',
         'USER': 'Dev_Cube_Web',
         'PASSWORD': 'G4L|pK$9tbal',
-        'HOST': '172.31.0.5,60322',
-        'PORT': '',
+        'HOST': '172.31.0.5',
+        'PORT': '60322',
         'OPTIONS': {
             'driver': 'ODBC Driver 18 for SQL Server',
+            'host_is_server': True,
+            'unicode_results': True,
             'extra_params': 'TrustServerCertificate=yes;Encrypt=no;Trusted_Connection=no;'
         },
     }
