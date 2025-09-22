@@ -4,7 +4,8 @@ from comptabilite.dynamic_labels import DynamicLabelsMixin
 
 class PerimetreConsoSociete(DynamicLabelsMixin, models.Model):
     """Modèle pour la table de jointure entre périmètres de consolidation et sociétés"""
-    id = models.IntegerField(primary_key=True, db_column='PECSOC_Id', verbose_name="ID")
+    # Clé primaire auto-générée côté SQL Server (IDENTITY)
+    id = models.AutoField(primary_key=True, db_column='PECSOC_Id', verbose_name="ID")
     perimetre_conso = models.ForeignKey('PerimetreConso', on_delete=models.CASCADE, db_column='PEC_Id', verbose_name="Périmètre Consolidation")
     societe = models.ForeignKey('comptabilite.Societe', on_delete=models.CASCADE, db_column='SOC_Id', verbose_name="Société")
 

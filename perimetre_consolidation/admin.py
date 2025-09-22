@@ -12,9 +12,11 @@ class PerimetreConsoSocieteAdmin(AdminLabelMixin, admin.ModelAdmin):
     ordering = ['perimetre_conso', 'societe']
     list_display_links = ['id', 'perimetre_conso', 'societe']
     
+    # Ne pas afficher/saisir l'ID dans le formulaire d'ajout/édition
+    readonly_fields = ('id',)
     fieldsets = (
         ('Informations générales', {
-            'fields': ('id', 'perimetre_conso', 'societe'),
+            'fields': ('perimetre_conso', 'societe'),
             'description': 'Liaison entre périmètre de consolidation et société'
         }),
     )
